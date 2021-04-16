@@ -26,7 +26,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.lang.NonNull;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -137,11 +136,23 @@ public class Code {
         ? text.codePoints().toArray()
         : null;    
   }
-  ;
+  
+  public boolean isSolved() {
+    return guesses
+        .stream()
+        .anyMatch(Guess::isSolution);
+  }
+  
+  @JsonProperty("text")
+  public String getSolution() {
+    return isSolved() ? text : null;
+  }
+  
   @PostLoad
   @PostPersist
   private void updateKey() {
     UUIDStringifier stringifier = Beans.bean(UUIDStringifier.class);
     key = stringifier.toString(id);
   }
+  
 }
